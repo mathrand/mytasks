@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>My Tasks</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <link href="static/tasks.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <div class="container py-5">
+      <h1 class="mb-4 text-center">📝 My Tasks</h1>
+
+      <div id="theme-toggle" style="position: fixed; top: 1rem; right: 1rem; font-size: 1.5rem; cursor: pointer; z-index: 1000;">
+        🌞
+      </div>
+
+      <form class="input-group mb-4" id="add-new-task">
+        <textarea class="form-control" id="task-title" name="title" rows="3" placeholder="Write your task here..."></textarea>
+        <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+
+      <div id="task-list" class="row">
+        {% include 'task_list.html' %}
+      </div>
+    </div>
+
+    <script>
+      const toggle = document.getElementById('theme-toggle');
+
+      function applyManualTheme(theme) {
+        document.body.classList.remove('manual-dark', 'manual-light');
+        if (theme) {
+          document.body.classList.add(`manual-${theme}`);
+          localStorage.setItem('manualTheme', theme);
+        } else {
+          localStorage.removeItem('manualTheme');
+        }
+        updateIcon();
+      }
+
+      function updateIcon() {
+        const theme = localStorage.getItem('manualTheme');
+        const isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        toggle.textContent = isDark ? '🌙' : '🌞';
+      }
+
+      const savedTheme = localStorage.getItem('manualTheme');
+      if (savedTheme) {
+        applyManualTheme(savedTheme);
+      } else {
+        updateIcon();
+      }
+
+      toggle.addEventListener('click', () => {
+        const current = localStorage.getItem('manualTheme');
+        const newTheme = current === 'dark' ? 'light' : 'dark';
+        applyManualTheme(newTheme);
+      });
+    </script>
+
+    <script>
+      function initSortable() {
+        const taskList = document.getElementById('task-list');
+        Sortable.create(taskList, {
+          animation: 150,
+          ghostClass: 'sortable-ghost',
+          onEnd: function (evt) {
+            const order = Array.from(taskList.children).map(item => item.dataset.id);
+            fetch('/reorder', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ order: order })
+            });
+          }
+        });
+      }
+      initSortable();
+    </script>
+
+    <script>
+      document.getElementById('add-new-task').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+
+        try {
+          const response = await fetch('/add', {
+            method: 'POST',
+            body: formData
+          });
+
+          if (!response.ok) throw new Error('Failed to add task');
+
+          const html = await response.text();
+          document.getElementById('task-list').innerHTML = html;
+
+          form.reset();
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      });
+    </script>
+
+    <script>
+      const textarea = document.getElementById('task-title');
+      textarea.addEventListener('input', () => {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+      });
+    </script>
+
+    <script>
+      const taskList = document.getElementById('task-list');
+
+      const observer = new MutationObserver((mutationsList, observer) => {
+        for (const mutation of mutationsList) {
+          if (mutation.type === 'childList') {
+            initSortable(); // Reinitialize when tasks are added/removed
+          }
+        }
+      });
+
+      observer.observe(taskList, {
+        childList: true,      // Watch for added/removed elements
+        subtree: false        // Only direct children of #task-list
+      });
+    </script>
+  </body>
+</html>

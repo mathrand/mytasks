@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Tasks</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        .done { text-decoration: line-through; color: gray; }
+    </style>
+</head>
+<body>
+    <h1>📝 My Tasks</h1>
+    <form action="/add" method="post">
+        <input type="text" name="title" placeholder="New task" required>
+        <button type="submit">Add</button>
+    </form>
+    <ul>
+        {% for task in tasks %}
+            <li>
+                <span class="{{ 'done' if task.done }}">{{ task.title }}</span>
+                {% if not task.done %}
+                    <a href="/complete/{{ task.id }}">✅</a>
+                {% endif %}
+                <a href="/delete/{{ task.id }}">🗑️</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+

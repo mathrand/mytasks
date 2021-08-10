@@ -1,0 +1,17 @@
+{% for task in tasks %}
+<div class="col-md-6 mb-3 task-item" data-id="{{ task.id }}">
+  <div class="card task-card">
+    <div class="card-body position-relative">
+      <div class="d-flex justify-content-end mb-2">
+        {% if not task.done %}
+        <a href="/complete/{{ task.id }}" class="btn btn-sm btn-outline-success me-1">✅</a>
+        {% endif %}
+        <a href="/delete/{{ task.id }}" class="btn btn-sm btn-outline-danger">🗑️</a>
+      </div>
+      <span style="{% if task.done %}text-decoration: line-through; color: gray;{% endif %}">
+        {{ task.title | replace('\n', '<br>') | safe }}
+      </span>
+    </div>
+  </div>
+</div>
+{% endfor %}

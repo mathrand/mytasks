@@ -1,0 +1,39 @@
+[project]
+name = "mytasks"
+version = "0.1.0"
+description = "A simple Flask-based to-do list application using SQLite."
+authors = [
+    { name = "Mathew Lee", email = "math.rand@gmail.com" }
+]
+dependencies = [
+    "flask",
+    "flask_sqlalchemy"
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "pytest"
+]
+
+[project.scripts]
+test = "pytest"
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | build
+  | dist
+  | __pycache__
+  | migrations
+)/
+'''
+
+[build-system]
+requires = ["setuptools>=54.0", "wheel"]
+build-backend = "setuptools.build_meta"

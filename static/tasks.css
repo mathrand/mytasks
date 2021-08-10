@@ -1,0 +1,42 @@
+/* Dragged task box */
+.sortable-ghost {
+    opacity: 0.4;
+    background-color: #dee2e6;
+}
+
+/* Default: Light theme */
+body {
+  background-color: #ffffff;
+  color: #000000;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* System prefers dark */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #121212;
+    color: #303030;
+  }
+}
+
+/* Manual override: force dark */
+body.manual-dark {
+  background-color: #121212 !important;
+  color: #303030 !important;
+}
+
+/* Manual override: force light */
+body.manual-light {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Dark mode toggle button */
+#theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 1000;
+}
